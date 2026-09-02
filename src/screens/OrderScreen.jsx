@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Ring from "../components/Ring";
 import DishArt from "../components/DishArt";
-import { PROTEIN } from "../data";
+import { ONDC, PROTEIN, ondcSaving } from "../data";
 import { useCountUp, useTimeline } from "../hooks";
 import {
   ArrowRight,
@@ -9,7 +9,6 @@ import {
   CheckIcon,
   ClockIcon,
   ShieldCheckIcon,
-  StoreIcon,
 } from "../components/Icons";
 
 /**
@@ -76,23 +75,15 @@ export default function OrderScreen({ dish, onHome, onSupplements }) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1.5 font-semibold text-brand-800">
             <ClockIcon size={13} /> Arrives in {dish.eta}
           </span>
-          {dish.channel === "ondc" ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-800 px-2.5 py-1.5 font-semibold text-white">
-              <BoltIcon size={13} /> Fulfilled over ONDC
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-ink-100 px-2.5 py-1.5 font-semibold text-ink-500">
-              <StoreIcon size={13} /> Partner kitchen
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-800 px-2.5 py-1.5 font-semibold text-white">
+            <BoltIcon size={13} /> Fulfilled over ONDC
+          </span>
         </div>
 
-        {dish.channel === "ondc" && (
-          <p className="mt-2.5 text-[12px] leading-snug text-ink-500">
-            &#8377;{dish.comparePrice - dish.price} less than the same bowl on {dish.compareOn} —
-            an open network has no aggregator commission to fund.
-          </p>
-        )}
+        <p className="mt-2.5 text-[12px] leading-snug text-ink-500">
+          &#8377;{ondcSaving(dish)} less than the same dish on {ONDC.compareOn} &mdash; an open
+          network has no aggregator commission to fund.
+        </p>
       </section>
 
       {/* ---- beat 2: the gap closes itself ---- */}

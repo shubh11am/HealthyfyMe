@@ -32,7 +32,9 @@ export const TRACKERS = [
   { key: "water", label: "Water", sub: "5 of 9 glasses", ring: "stroke-hydr-400", pct: 55, action: "add" },
 ];
 
-// Three gap-fit dishes. Exactly one is routed through ONDC and priced lower.
+// Every dish is sourced over ONDC, each at its own saving against the
+// aggregator price. `comparePrice` is what the same dish costs on the
+// delivery apps; `price` is what it costs through the open network.
 export const DISHES = [
   {
     id: "paneer",
@@ -45,8 +47,8 @@ export const DISHES = [
     carbs: 38,
     fat: 16,
     price: 259,
+    comparePrice: 299,
     veg: true,
-    channel: "partner",
     art: "paneer",
   },
   {
@@ -60,14 +62,8 @@ export const DISHES = [
     carbs: 44,
     fat: 14,
     price: 239,
-    veg: false,
-    channel: "ondc",
-    channelNote: "via ONDC — ₹50 cheaper",
-    // Why the open network is cheaper, stated where the claim is made.
     comparePrice: 289,
-    compareOn: "Zomato & Swiggy",
-    channelWhy:
-      "The same bowl lists at ₹289 on Zomato and Swiggy, which charge the kitchen roughly 20% commission on every order. On ONDC, Healthify buys straight from Protein Kitchen as a buyer app — there is no aggregator cut to fund, so the ₹50 goes to you instead of the middleman.",
+    veg: false,
     art: "chicken",
   },
   {
@@ -81,11 +77,23 @@ export const DISHES = [
     carbs: 31,
     fat: 9,
     price: 189,
+    comparePrice: 219,
     veg: true,
-    channel: "partner",
     art: "parfait",
   },
 ];
+
+export const ONDC = {
+  compareOn: "Zomato & Swiggy",
+  commission: "roughly 20%",
+};
+
+/** What the open network saves on a given dish. */
+export const ondcSaving = (dish) => dish.comparePrice - dish.price;
+
+/** The argument behind the badge, written per dish so the numbers match. */
+export const ondcWhy = (dish) =>
+  `The same dish lists at ₹${dish.comparePrice} on ${ONDC.compareOn}, which charge ${dish.kitchen} ${ONDC.commission} commission on every order. On ONDC, Healthify buys straight from the kitchen as a buyer app — there is no aggregator cut to fund, so the ₹${ondcSaving(dish)} goes to you instead of the middleman.`;
 
 // Seven-day micronutrient trend that unlocks the Tata 1mg suggestion.
 export const VITAMIN_D_WEEK = [

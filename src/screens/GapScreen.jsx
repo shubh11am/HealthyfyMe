@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Ring from "../components/Ring";
 import DishArt from "../components/DishArt";
-import { DISHES, PROTEIN } from "../data";
+import { DISHES, ONDC, PROTEIN, ondcSaving, ondcWhy } from "../data";
 import {
   ArrowLeft,
   BoltIcon,
@@ -14,7 +14,7 @@ import {
 
 export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
   const selected = DISHES.find((d) => d.id === selectedId);
-  const [whyOpen, setWhyOpen] = useState(false);
+  const [whyOpenId, setWhyOpenId] = useState(null);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -67,8 +67,9 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
         <h2 className="px-1 pt-6 pb-1 text-[17px] font-semibold tracking-tight">
           3 meals that fit your gap
         </h2>
-        <p className="px-1 pb-3 text-[13px] text-ink-500">
-          Ranked by how much of the gap they close, then price.
+        <p className="px-1 pb-3 text-[13px] leading-snug text-ink-500">
+          Ranked by how much of the gap they close, then price. All three are sourced over ONDC,
+          so every one of them undercuts {ONDC.compareOn}.
         </p>
 
         <div className="flex flex-col gap-3">
@@ -158,29 +159,27 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
                 </div>
 
                 <div className="mt-3 flex items-center gap-2 border-t border-ink-100 pt-3">
-                  {dish.channel === "ondc" && (
-                    <button
-                      type="button"
-                      aria-expanded={whyOpen}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setWhyOpen((v) => !v);
-                      }}
-                      className="inline-flex items-center gap-1 rounded-full bg-brand-800 py-1 pr-2 pl-2.5 text-[11.5px] font-semibold text-white"
-                    >
-                      <BoltIcon size={13} /> {dish.channelNote}
-                      <ChevronDown
-                        size={14}
-                        className={`transition-transform ${whyOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    aria-expanded={whyOpenId === dish.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setWhyOpenId((v) => (v === dish.id ? null : dish.id));
+                    }}
+                    className="inline-flex items-center gap-1 rounded-full bg-brand-800 py-1 pr-2 pl-2.5 text-[11.5px] font-semibold text-white"
+                  >
+                    <BoltIcon size={13} /> via ONDC &mdash; &#8377;{ondcSaving(dish)} cheaper
+                    <ChevronDown
+                      size={14}
+                      className={`transition-transform ${
+                        whyOpenId === dish.id ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
                   <span className="ml-auto flex items-baseline gap-1.5">
-                    {dish.comparePrice && (
-                      <span className="text-[13px] text-ink-400 line-through">
-                        &#8377;{dish.comparePrice}
-                      </span>
-                    )}
+                    <span className="text-[13px] text-ink-400 line-through">
+                      &#8377;{dish.comparePrice}
+                    </span>
                     <span className="text-[17px] font-bold tracking-tight">
                       &#8377;{dish.price}
                     </span>
@@ -188,13 +187,13 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
                 </div>
 
                 {/* why the open network is cheaper */}
-                {dish.channel === "ondc" && whyOpen && (
+                {whyOpenId === dish.id && (
                   <div className="mt-2.5 animate-fade rounded-2xl bg-brand-50 p-3.5">
                     <p className="text-[13px] font-semibold text-brand-800">
-                      Why it&rsquo;s &#8377;50 less than {dish.compareOn}
+                      Why it&rsquo;s &#8377;{ondcSaving(dish)} less than {ONDC.compareOn}
                     </p>
                     <p className="mt-1 text-[12.5px] leading-snug text-brand-800/75">
-                      {dish.channelWhy}
+                      {ondcWhy(dish)}
                     </p>
                     <p className="mt-2 text-[11px] text-brand-800/50">
                       Illustrative pricing for this concept.
