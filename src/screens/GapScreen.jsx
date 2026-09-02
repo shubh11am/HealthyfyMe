@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Ring from "../components/Ring";
 import DishArt from "../components/DishArt";
 import { DISHES, PROTEIN } from "../data";
@@ -5,6 +6,7 @@ import {
   ArrowLeft,
   BoltIcon,
   CheckIcon,
+  ChevronDown,
   ClockIcon,
   ShieldCheckIcon,
   StarIcon,
@@ -12,6 +14,7 @@ import {
 
 export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
   const selected = DISHES.find((d) => d.id === selectedId);
+  const [whyOpen, setWhyOpen] = useState(false);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -73,12 +76,20 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
             const fill = Math.min(Math.round((dish.protein / PROTEIN.short) * 100), 100);
             const on = dish.id === selectedId;
             return (
-              <button
+              <div
                 key={dish.id}
-                type="button"
+                role="button"
+                tabIndex={0}
+                aria-pressed={on}
                 onClick={() => onSelect(dish.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelect(dish.id);
+                  }
+                }}
                 style={{ animationDelay: `${120 + i * 90}ms` }}
-                className={`animate-rise rounded-card border-2 bg-white p-3.5 text-left shadow-card transition-all active:scale-[0.99] ${
+                className={`animate-rise cursor-pointer rounded-card border-2 bg-white p-3.5 text-left shadow-card transition-all active:scale-[0.99] ${
                   on ? "border-brand-600" : "border-transparent"
                 }`}
               >
@@ -148,14 +159,26 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
 
                 <div className="mt-3 flex items-center gap-2 border-t border-ink-100 pt-3">
                   {dish.channel === "ondc" && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-800 px-2.5 py-1 text-[11.5px] font-semibold text-white">
+                    <button
+                      type="button"
+                      aria-expanded={whyOpen}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWhyOpen((v) => !v);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-full bg-brand-800 py-1 pr-2 pl-2.5 text-[11.5px] font-semibold text-white"
+                    >
                       <BoltIcon size={13} /> {dish.channelNote}
-                    </span>
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform ${whyOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
                   )}
                   <span className="ml-auto flex items-baseline gap-1.5">
-                    {dish.strikePrice && (
+                    {dish.comparePrice && (
                       <span className="text-[13px] text-ink-400 line-through">
-                        &#8377;{dish.strikePrice}
+                        &#8377;{dish.comparePrice}
                       </span>
                     )}
                     <span className="text-[17px] font-bold tracking-tight">
@@ -163,7 +186,22 @@ export default function GapScreen({ selectedId, onSelect, onBack, onOrder }) {
                     </span>
                   </span>
                 </div>
-              </button>
+
+                {/* why the open network is cheaper */}
+                {dish.channel === "ondc" && whyOpen && (
+                  <div className="mt-2.5 animate-fade rounded-2xl bg-brand-50 p-3.5">
+                    <p className="text-[13px] font-semibold text-brand-800">
+                      Why it&rsquo;s &#8377;50 less than {dish.compareOn}
+                    </p>
+                    <p className="mt-1 text-[12.5px] leading-snug text-brand-800/75">
+                      {dish.channelWhy}
+                    </p>
+                    <p className="mt-2 text-[11px] text-brand-800/50">
+                      Illustrative pricing for this concept.
+                    </p>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

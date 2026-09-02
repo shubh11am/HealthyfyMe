@@ -86,6 +86,13 @@ export default function OrderScreen({ dish, onHome, onSupplements }) {
             </span>
           )}
         </div>
+
+        {dish.channel === "ondc" && (
+          <p className="mt-2.5 text-[12px] leading-snug text-ink-500">
+            &#8377;{dish.comparePrice - dish.price} less than the same bowl on {dish.compareOn} —
+            an open network has no aggregator commission to fund.
+          </p>
+        )}
       </section>
 
       {/* ---- beat 2: the gap closes itself ---- */}

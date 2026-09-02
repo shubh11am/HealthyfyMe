@@ -60,10 +60,14 @@ export const DISHES = [
     carbs: 44,
     fat: 14,
     price: 239,
-    strikePrice: 289,
     veg: false,
     channel: "ondc",
     channelNote: "via ONDC — ₹50 cheaper",
+    // Why the open network is cheaper, stated where the claim is made.
+    comparePrice: 289,
+    compareOn: "Zomato & Swiggy",
+    channelWhy:
+      "The same bowl lists at ₹289 on Zomato and Swiggy, which charge the kitchen roughly 20% commission on every order. On ONDC, Healthify buys straight from Protein Kitchen as a buyer app — there is no aggregator cut to fund, so the ₹50 goes to you instead of the middleman.",
     art: "chicken",
   },
   {
